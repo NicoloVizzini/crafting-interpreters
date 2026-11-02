@@ -80,7 +80,37 @@ class Scanner {
         if (match('/')) {
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd()) advance();
-        } else {
+        } 
+        else if (match('*')) {
+          int depth = 1;
+        
+          int peek_previous_skip = 0;
+          //A C syle comment goes until it find a */
+          while (depth > 0 && !isAtEnd()) {
+        
+            if (peek() == '\n'){
+              line++;
+            }
+            if (peek() == '/' && peekNext() == '*'  && peek_previous_skip < 1){
+              peek_previous_skip = 2;
+              depth++;
+            }
+            if(peek() == '*' && peekNext() == '/' && peek_previous_skip < 1){
+              peek_previous_skip = 2;
+              depth--;
+            }
+            
+            peek_previous_skip --;
+            advance();
+          }
+          if (isAtEnd()) {
+            Lox.error(line, "Unterminated comment.");
+          }
+          else{
+            advance();
+          }
+        }
+        else {
           addToken(SLASH);
         }
         break;
